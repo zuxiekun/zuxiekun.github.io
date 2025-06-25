@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩查看</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .backdrop-blur-sm {
+                backdrop-filter: blur(4px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-white overflow-hidden">
+    <!-- 提示模态框 -->
+    <div id="notice-modal" class="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 scale-100">
+            <div class="text-center mb-6">
+                <i class="fa fa-exclamation-circle text-primary text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">重要提示</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    请各位考生注意，<br>
+                    请勿以截图等形式传播、泄露成绩信息！
+                </p>
+            </div>
+            <div class="flex justify-center">
+                <button id="confirm-btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-8 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-lg hover:shadow-xl">
+                    点击确定查看内容
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片容器 -->
+    <div id="image-container" class="fixed inset-0 bg-white flex items-center justify-center opacity-0 transition-opacity duration-3000">
+        <img src="img/sangzhi.jpg" alt="成绩图片" class="max-w-full max-h-full object-contain">
+    </div>
+
+    <!-- 背景音乐 -->
+    <audio id="bg-music" loop>
+        <source src="img/haodada.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const noticeModal = document.getElementById('notice-modal');
+            const confirmBtn = document.getElementById('confirm-btn');
+            const imageContainer = document.getElementById('image-container');
+            const bgMusic = document.getElementById('bg-music');
+
+            // 图片加载完成后再显示
+            const img = document.querySelector('#image-container img');
+            let isImageLoaded = false;
+            
+            img.onload = function() {
+                isImageLoaded = true;
+            }
+            
+            // 确保即使图片已缓存也能触发加载完成事件
+            if (img.complete) {
+                isImageLoaded = true;
+            }
+
+            // 确认按钮点击事件
+            confirmBtn.addEventListener('click', function() {
+                // 隐藏模态框
+                noticeModal.classList.add('opacity-0');
+                noticeModal.classList.add('pointer-events-none');
+                
+                // 延迟显示图片，确保过渡效果流畅
+                setTimeout(() => {
+                    if (isImageLoaded) {
+                        // 图片已加载，直接显示
+                        showImageAndPlayMusic();
+                    } else {
+                        // 图片未加载完成，等待加载完成
+                        img.onload = showImageAndPlayMusic;
+                    }
+                }, 300);
+            });
+
+            function showImageAndPlayMusic() {
+                // 显示图片并淡入
+                imageContainer.classList.remove('opacity-0');
+                imageContainer.classList.add('opacity-100');
+                
+                // 播放音乐
+                bgMusic.play().catch(e => {
+                    // 自动播放失败，添加点击事件作为后备
+                    document.addEventListener('click', function playOnClick() {
+                        bgMusic.play();
+                        document.removeEventListener('click', playOnClick);
+                    }, { once: true });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+    
